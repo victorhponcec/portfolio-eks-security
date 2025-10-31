@@ -19,11 +19,21 @@ resource "aws_subnet" "public_a_az1" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = "10.111.1.0/24"
   availability_zone = var.az1
+  tags = {
+    Name                                 = "public-1"
+    "kubernetes.io/role/elb"             = "1"
+    "kubernetes.io/cluster/eks-security" = "shared"
+  }
 }
 resource "aws_subnet" "public_b_az2" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = "10.111.2.0/24"
   availability_zone = var.az2
+  tags = {
+    Name                                 = "public-1"
+    "kubernetes.io/role/elb"             = "1"
+    "kubernetes.io/cluster/eks-security" = "shared"
+  }
 }
 
 #Private AZs
@@ -31,11 +41,21 @@ resource "aws_subnet" "private_a_az1" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = "10.111.3.0/24"
   availability_zone = var.az1
+  tags = {
+    Name                                 = "private-1"
+    "kubernetes.io/role/internal-elb"    = "1"
+    "kubernetes.io/cluster/eks-security" = "shared"
+  }
 }
 resource "aws_subnet" "private_b_az2" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = "10.111.4.0/24"
   availability_zone = var.az2
+  tags = {
+    Name                                 = "private-1"
+    "kubernetes.io/role/internal-elb"    = "1"
+    "kubernetes.io/cluster/eks-security" = "shared"
+  }
 }
 
 #IGW + NATGW

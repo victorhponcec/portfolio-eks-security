@@ -6,7 +6,7 @@ resource "aws_eks_cluster" "security" {
   }
 
   role_arn = aws_iam_role.cluster.arn
-  version  = "1.31"
+  version  = "1.34"
 
   bootstrap_self_managed_addons = false
 
