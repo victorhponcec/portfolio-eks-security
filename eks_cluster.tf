@@ -11,7 +11,7 @@ resource "aws_eks_cluster" "security" {
   bootstrap_self_managed_addons = false
 
   compute_config {
-    enabled       = true
+    enabled       = true #self-managed compute
     node_pools    = ["general-purpose"]
     node_role_arn = aws_iam_role.node.arn
   }
