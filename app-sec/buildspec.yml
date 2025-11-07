@@ -3,30 +3,36 @@ version: 0.2
 env:
   variables:
     AWS_DEFAULT_REGION: "us-east-1"
-    IMAGE_REPO_NAME: "app-sec"
-    IMAGE_TAG: "latest"
+    ECR_REPO: "" # This will be injected by Terraform environment_variable
 
 phases:
   pre_build:
     commands:
+      - echo "=== Pre-build phase ==="
+      - echo "AWS CLI version: $(aws --version)"
       - echo "Logging in to Amazon ECR..."
-      - aws --version
-      - ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-      - REPOSITORY_URI=$ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME
-      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $REPOSITORY_URI
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_REPO
+      - echo "Logged in to $ECR_REPO"
 
   build:
     commands:
-      - echo "Building the Docker image..."
-      - cd app-sec  # app-sec folder | I'm using the same repo for terraform and the APP
-      - docker build -t $IMAGE_REPO_NAME .
-      - docker tag $IMAGE_REPO_NAME:latest $REPOSITORY_URI:$IMAGE_TAG
+      - echo "=== Build phase ==="
+      - echo "Current directory: $(pwd)"
+      - echo "Listing files:"
+      - ls -la
+      - cd app-sec
+      - echo "Building Docker image in $(pwd)..."
+      - ls -la  # Verify Dockerfile exists
+      - docker build -t $ECR_REPO .
+      - docker tag $ECR_REPO:latest $ECR_REPO:latest
+      - echo "Docker image built and tagged"
 
   post_build:
     commands:
+      - echo "=== Post-build phase ==="
       - echo "Pushing Docker image to ECR..."
-      - docker push $REPOSITORY_URI:$IMAGE_TAG
-      - echo "Image pushed to $REPOSITORY_URI:$IMAGE_TAG"
+      - docker push $ECR_REPO:latest
+      - echo "Docker image pushed: $ECR_REPO:latest"
 
 artifacts:
   files:
